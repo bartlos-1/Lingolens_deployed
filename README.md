@@ -4,7 +4,7 @@ LingoLens is a specialized computer vision and deep learning platform designed f
 
 This repository handles the core pipeline architecture, optimized inference engine, and deployment assets for the model.
 
-### BASED ON LIPNET RESEARCH PAPER BY UNIVERSITY OF OXFORD AND GOOGLE DEEPMIND
+### BASED ON LIPNET RESEARCH PAPER BY RESEARCHERS AT UNIVERSITY OF OXFORD AND GOOGLE DEEPMIND
 ---
 
 ## 🌐 Live Deployments & Research
