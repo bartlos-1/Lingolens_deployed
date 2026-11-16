@@ -36,6 +36,6 @@ def load_model() -> Sequential:
     model.add(Dense(41, kernel_initializer='he_normal', activation='softmax'))
     
     # Load weights from a checkpoint file
-    model.load_weights(os.path.join('.', 'app', 'models', 'checkpoint'))
+    model.load_weights(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'models', 'checkpoint')).expect_partial()
     
     return model

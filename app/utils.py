@@ -1,8 +1,12 @@
 import tensorflow as tf
 from typing import List
+from pathlib import Path
 import cv2
 import os 
 from difflib import SequenceMatcher
+
+# Repository root, so paths work no matter which folder the app is started from
+ROOT = Path(__file__).resolve().parent.parent
 # Define the vocabulary for character mapping
 vocab = [x for x in "abcdefghijklmnopqrstuvwxyz'?!123456789 "]
 
@@ -14,25 +18,12 @@ num_to_char = tf.keras.layers.StringLookup(
     vocabulary=char_to_num.get_vocabulary(), oov_token="", invert=True
 )
 
-def load_data(path: str): 
-    # Convert the path from bytes to string
-    path = bytes.decode(path.numpy())
-    
-    # Extract the file name from the path
-    file_name = path.split('/')[-1].split('.')[0]
-    
-    # IF RUNNNING ON WINDOWS UNCOMMENT LINE BELOW, AND PUT THE LINE ABOVE IN COMMENTS
-    # file_name = path.split('\\')[-1].split('.')[0]
-    
-    # Construct the paths to the video and alignment files
-    video_path = os.path.join('.','data','s1',f'{file_name}.mpg')
-    alignment_path = os.path.join('.','data','alignments','s1',f'{file_name}.align')
-    
-    # Load the video frames and alignments
-    frames = load_video(video_path) 
-    alignments = load_alignments(alignment_path)
-    
-    return frames, alignments
+def load_data(path):
+    """Load one GRID clip (frames) and its transcript (as character ids) given the video's path."""
+    file_name = Path(str(path)).stem
+    video_path = ROOT / 'data' / 's1' / f'{file_name}.mpg'
+    alignment_path = ROOT / 'data' / 'alignments' / 's1' / f'{file_name}.align'
+    return load_video(str(video_path)), load_alignments(str(alignment_path))
 
 def load_alignments(path:str) -> List[str]: 
     # Read the lines from the alignment file
@@ -71,4 +62,14 @@ def load_video(path:str) -> List[float]:
 
 
 def similar(a, b):
+    """Character-level similarity between two strings (0 to 1)."""
     return SequenceMatcher(None, a, b).ratio()
+
+
+def word_accuracy(real: str, predicted: str) -> float:
+    """Share of the real sentence's words that the prediction gets right, in order."""
+    real_words, pred_words = real.split(), predicted.split()
+    if not real_words:
+        return 0.0
+    matched = sum(b.size for b in SequenceMatcher(None, real_words, pred_words).get_matching_blocks())
+    return matched / len(real_words)

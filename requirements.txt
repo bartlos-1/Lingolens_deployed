@@ -1,5 +1,10 @@
+# Versions pinned together and tested: TensorFlow 2.15 needs NumPy < 2, protobuf < 5 and ml-dtypes 0.3
 tensorflow==2.15.1
-imageio==2.23.0
-opencv-python-headless==4.9.0.80
-numpy==1.24.3
 keras==2.15.0
+numpy==1.24.3
+ml-dtypes==0.3.2
+protobuf==4.25.9
+opencv-python-headless==4.9.0.80
+pillow==12.3.0
+imageio-ffmpeg==0.6.0
+streamlit==1.60.0

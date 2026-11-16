@@ -30,6 +30,7 @@ implementation started from a public LipNet tutorial in TensorFlow.
 ```bash
 git clone https://github.com/bartlos-1/Lingolens_deployed.git
 cd Lingolens_deployed
-pip install -r requirements.txt   # TensorFlow 2.15, OpenCV, imageio; also needs ffmpeg installed
-cd app && streamlit run streamlitapp.py
+python3.11 -m venv .venv && source .venv/bin/activate   # TensorFlow 2.15 needs Python 3.9-3.11
+pip install -r requirements.txt                          # ffmpeg comes bundled via imageio-ffmpeg
+streamlit run app/streamlitapp.py
 ```
