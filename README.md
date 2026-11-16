@@ -5,6 +5,7 @@ It's a university project from 2024, built with Tamerlan Ormanbayev. The model f
 [LipNet](https://arxiv.org/abs/1611.01599) architecture (Assael et al., Oxford / DeepMind), and our
 implementation started from a public LipNet tutorial in TensorFlow.
 
+**Demo:** https://lingoread.streamlit.app/ (free hosting, so the first load can take a minute)
 
 ## How it works
 
