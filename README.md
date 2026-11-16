@@ -1,39 +1,36 @@
-# LingoLens 👄🔍
+# LingoLens: lip reading from video
 
-LingoLens is a specialized computer vision and deep learning platform designed for automated lip-reading and visual speech recognition. By analyzing localized facial landmarks and mouth movements from video streams, the system maps spatiotemporal visual features to textual representations.
+LingoLens takes a silent video of someone speaking and predicts the sentence from their lip movements.
+It's a university project from 2024, built with Tamerlan Ormanbayev. The model follows the
+[LipNet](https://arxiv.org/abs/1611.01599) architecture (Assael et al., Oxford / DeepMind), and our
+implementation started from a public LipNet tutorial in TensorFlow.
 
-This repository handles the core pipeline architecture, optimized inference engine, and deployment assets for the model.
+**Demo:** https://lingoread.streamlit.app/ (free hosting, so it can take a minute to wake up)
 
-### BASED ON LIPNET RESEARCH PAPER BY RESEARCHERS AT UNIVERSITY OF OXFORD AND GOOGLE DEEPMIND
----
+## How it works
 
-## 🌐 Live Deployments & Research
-* **Interactive Web Application:** [Access the Live Demo](https://lingoread.streamlit.app/)
-* **Research Paper:** Read the full architectural methodology: [Read the Paper](https://lingopaper.tiiny.site/)
+1. **Preprocessing (OpenCV):** each video is split into 75 frames, converted to grayscale, cropped to a fixed mouth
+   region, and normalised.
+2. **Model (TensorFlow/Keras):** three 3D convolution layers learn the shape and motion of the lips across frames,
+   followed by two bidirectional LSTM layers (128 units each, with dropout) that read the sequence in both directions.
+   A dense softmax layer outputs one character per frame.
+3. **Training:** CTC loss, which lets the model learn the alignment between frames and characters without
+   frame-level labels. Adam optimiser, learning rate 1e-4, about 100 epochs.
 
----
+## Data and results
 
-## 🚀 Key Features
-* **Spatiotemporal Feature Extraction:** Automated region-of-interest (ROI) isolation targeting lip contours utilizing OpenCV.
-* **Deep Learning Architecture:** Utilizes a custom sequence-to-sequence network integrating Bidirectional Long Short-Term Memory (BiLSTM) layers to capture temporal alignment in continuous speech.
-* **Optimized Pipeline:** Streamlined frame preprocessing and tokenization sequences designed for seamless model inference.
+- Trained on the [GRID audio-visual corpus](https://doi.org/10.5281/zenodo.3625687), which has short, fixed-grammar
+  sentences such as "put red at G9 now". We used one speaker (speaker 1).
+- On 100 test videos from that same speaker, the model got about 99% of words right.
+- That number is from a single speaker with a small, fixed vocabulary, so it shows the pipeline works.
+  It does not show that the model would work on new people or natural speech. Training on more speakers,
+  with face detection and data augmentation, would be the next step.
 
-## 📊 Dataset & Architecture
-The model was trained using the **GRID Corpus** dataset, a large-scale audio-visual sentence corpus. 
-* **Input Pipeline:** Raw video format $\rightarrow$ Frame extraction $\rightarrow$ Face alignment & Mouth ROI isolation $\rightarrow$ Grayscale normalization.
-* **Model Topology:** Spatiotemporal Convolutions coupled with Bidirectional LSTMs to process sequential visual frames and decode text sequences.
+## Running it
 
-## ⚙️ Tech Stack & Dependencies
-* **Core Language:** Python
-* **Deep Learning Framework:** TensorFlow / Keras
-* **Computer Vision:** OpenCV (cv2)
-* **Data Processing:** NumPy, Matplotlib
-
-*All environment dependencies are fully managed and detailed in the root `requirements.txt` file.*
-
-## 🛠️ Setup & Installation
-
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/bartlos-1/Lingolens_deployed.git](https://github.com/bartlos-1/Lingolens_deployed.git)
-   cd Lingolens_deployed
+```bash
+git clone https://github.com/bartlos-1/Lingolens_deployed.git
+cd Lingolens_deployed
+pip install -r requirements.txt   # TensorFlow 2.15, OpenCV, imageio; also needs ffmpeg installed
+cd app && streamlit run streamlitapp.py
+```
