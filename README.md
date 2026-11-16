@@ -31,6 +31,6 @@ implementation started from a public LipNet tutorial in TensorFlow.
 git clone https://github.com/bartlos-1/Lingolens_deployed.git
 cd Lingolens_deployed
 python3.11 -m venv .venv && source .venv/bin/activate   # TensorFlow 2.15 needs Python 3.9-3.11
-pip install -r requirements.txt                          # ffmpeg comes bundled via imageio-ffmpeg
+pip install -r requirements.txt
 streamlit run app/streamlitapp.py
 ```

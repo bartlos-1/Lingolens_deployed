@@ -1,12 +1,9 @@
 """LingoLens demo: lip reading from silent video (LipNet-style model trained on one GRID speaker)."""
 import io
 import os
-import subprocess
 import sys
-import tempfile
-from pathlib import Path
 
-import imageio_ffmpeg
+import cv2
 import numpy as np
 import streamlit as st
 import tensorflow as tf
@@ -33,16 +30,22 @@ def get_model():
 
 
 @st.cache_data(show_spinner=False)
-def to_mp4(video_path: str) -> bytes:
-    """Browsers can't play GRID's .mpg files, so convert to H.264 MP4 with the bundled ffmpeg."""
-    with tempfile.TemporaryDirectory() as tmp:
-        out = os.path.join(tmp, "clip.mp4")
-        subprocess.run(
-            [imageio_ffmpeg.get_ffmpeg_exe(), "-loglevel", "error", "-i", video_path,
-             "-vcodec", "libx264", "-pix_fmt", "yuv420p", "-an", out, "-y"],
-            check=True,
-        )
-        return Path(out).read_bytes()
+def clip_preview(video_path: str, width: int = 270) -> bytes:
+    """The original clip as an animated GIF (GRID clips are 3 s at 25 fps). Uses OpenCV, which already decodes
+    the .mpg files for the model, so no video encoder is needed on the server."""
+    cap = cv2.VideoCapture(video_path)
+    images = []
+    while True:
+        ok, frame = cap.read()
+        if not ok:
+            break
+        h, w = frame.shape[:2]
+        frame = cv2.resize(frame, (width, round(h * width / w)), interpolation=cv2.INTER_AREA)
+        images.append(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
+    cap.release()
+    buf = io.BytesIO()
+    images[0].save(buf, format="GIF", save_all=True, append_images=images[1:], duration=40, loop=0)
+    return buf.getvalue()
 
 
 def to_gif(frames) -> bytes:
@@ -65,7 +68,7 @@ selected = st.selectbox("Choose a video", options, index=None, placeholder="Sele
 
 if selected:
     video_path = VIDEO_DIR / selected
-    st.video(to_mp4(str(video_path)))
+    st.image(clip_preview(str(video_path)), caption="The clip (silent, looping)")
 
     if st.button("Lip read", use_container_width=True, type="primary"):
         frames, annotations = load_data(video_path)

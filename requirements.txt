@@ -6,5 +6,4 @@ ml-dtypes==0.3.2
 protobuf==4.25.9
 opencv-python-headless==4.9.0.80
 pillow==12.3.0
-imageio-ffmpeg==0.6.0
 streamlit==1.60.0
